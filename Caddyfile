@@ -1,0 +1,5 @@
+shortsgenie.ai {
+reverse_proxy sg-portal:3000
+tls /etc/ssl/certs/custom/shortsgenie.pem /etc/ssl/certs/custom/shortsgenie.pem
+
+}
