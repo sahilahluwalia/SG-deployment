@@ -1,7 +1,6 @@
-version: '3.7'
+version: '3'
 
 services:
-
   caddy_reverse_proxy:
     image: caddy/caddy:latest
     container_name: caddy
@@ -23,11 +22,11 @@ services:
   sg-portal:
     container_name: sg-portal
     image: ggoneman/shortsgenie:latest
-    pull_policy: always
+    env_file:
+      - .env.docker
     restart: unless-stopped
     networks:
       - caddy_network
-
 
 networks:
   caddy_network:
