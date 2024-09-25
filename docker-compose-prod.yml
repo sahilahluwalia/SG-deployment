@@ -4,45 +4,57 @@ services:
     command:
       - "--label-enable"
       - "--interval"
-      - "30"
+      - "120"
       - "--rolling-restart"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker/config.json:/config.json
   reverse-proxy:
     image: traefik:v3.1
     command:
-      - "--providers.docker"
+      - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entryPoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
       - "--certificatesresolvers.myresolver.acme.email=sahil@shortsgenie.ai"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--log.level=DEBUG"  # Set log level to DEBUG
+      - "--accesslog=true"    # Enable access logs
+      - "--accesslog.filePath=/var/log/access.log"
+      - "--api.insecure=true"
+      - --providers.docker.network=proxy
     ports:
       - "80:80"
       - "443:443"
+      - "8080:8080"
     volumes:
       - letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
-  sg-portal:
+      - ./traefik/logs:/var/log
+  shortsgenie:
     image: ggoneman/shortsgenie:latest
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.guestbook.rule=Host(`shortsgenie.ai`)"
-      - "traefik.http.routers.guestbook.entrypoints=websecure"
-      - "traefik.http.routers.guestbook.tls.certresolver=myresolver"
+      - "traefik.http.routers.shortsgenie.rule=Host(`shortsgenie.ai`) || Host(`www.shortsgenie.ai`)"
+      - "traefik.http.routers.shortsgenie.entrypoints=websecure"
+      - "traefik.http.routers.shortsgenie.tls.certresolver=myresolver"
       - "com.centurylinklabs.watchtower.enable=true"
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 2
     restart: always
+    depends_on:
+      - reverse-proxy
+    env_file:
+      - .env.docker
 
 
 volumes:
   letsencrypt:
-secrets:
-  db-password:
-    file: db/password.txt
+    name: letsencrypt
+  traefik:
+    name: traefik
