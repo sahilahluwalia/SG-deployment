@@ -28,8 +28,7 @@ services:
       - letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
   sg-portal:
-#    image: ggoneman/shortsgenie:latest
-    image: nextcloud:stable
+    image: ggoneman/shortsgenie:latest
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.guestbook.rule=Host(`shortsgenie.ai`)"
