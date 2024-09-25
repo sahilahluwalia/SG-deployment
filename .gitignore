@@ -1,0 +1,5 @@
+/docker/config.json
+.env.docker
+/certs
+/private
+/traefik/*
