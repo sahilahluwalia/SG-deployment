@@ -23,18 +23,17 @@ services:
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       - "--log.level=DEBUG"  # Set log level to DEBUG
-      - "--accesslog=true"    # Enable access logs
-      - "--accesslog.filePath=/var/log/access.log"
+#      - "--accesslog=true"    # Enable access logs
+#      - "--accesslog.filePath=/var/log/access.log"
       - "--api.insecure=true"
-      - --providers.docker.network=proxy
     ports:
       - "80:80"
       - "443:443"
       - "8080:8080"
     volumes:
-      - letsencrypt:/letsencrypt
+      - ./letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./traefik/logs:/var/log
+#      - ./traefik/logs:/var/log
   shortsgenie:
     image: ggoneman/shortsgenie:latest
     labels:
