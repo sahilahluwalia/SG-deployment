@@ -2,4 +2,5 @@
 .env.docker
 /certs
 /private
-/traefik/*
+/traefik
+/letsencrypt
