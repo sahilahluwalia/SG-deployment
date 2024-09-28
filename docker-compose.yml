@@ -6,6 +6,8 @@ services:
       - "--interval"
       - "120"
       - "--rolling-restart"
+      - "--cleanup"
+      - "--debug"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./docker/config.json:/config.json
@@ -24,9 +26,19 @@ services:
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       - "--log.level=ERROR"  # Set log level to ERROR
 #      - "--log.level=DEBUG"  # Set log level to DEBUG
-#      - "--accesslog=true"    # Enable access logs
-#      - "--accesslog.filePath=/var/log/access.log"
+      #      - "--accesslog=true"    # Enable access logs
+      #      - "--accesslog.filePath=/var/log/access.log"
       - "--api.dashboard=true"
+      #      - "--api.insecure=true"
+      - "--log.maxage=3"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`rp.shortsgenie.ai`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.usersfile=/users/users.txt"
     ports:
       - "80:80"
       - "443:443"
@@ -34,7 +46,9 @@ services:
     volumes:
       - ./letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
-#      - ./traefik/logs:/var/log
+      #      - ./traefik/logs:/var/log
+      - ./users:/users
+
   shortsgenie:
     image: ggoneman/shortsgenie:latest
     labels:
@@ -58,3 +72,4 @@ volumes:
     name: letsencrypt
   traefik:
     name: traefik
+
