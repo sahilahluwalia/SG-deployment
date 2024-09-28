@@ -33,7 +33,7 @@ services:
       - "--log.maxage=3"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`rp.shortsgenie.ai`)"
+      - "traefik.http.routers.dashboard.rule=Host(`rp.shortsgenie.ai`)||Host(`www.rp.shortsgenie.ai`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
       - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
@@ -42,7 +42,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"
     volumes:
       - ./letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
