@@ -64,11 +64,16 @@ services:
       - reverse-proxy
     env_file:
       - .env.docker
-
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "5"
+    volumes:
+      - ./logs:/logs
 
 volumes:
   letsencrypt:
     name: letsencrypt
   traefik:
     name: traefik
-
